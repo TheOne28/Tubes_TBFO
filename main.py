@@ -44,15 +44,21 @@ for line in lines:
         #menghilangkan komentar 1 baris
         line = re.sub(" *#.*",'',line)
         #menghilangkan isi semua string valid
-        line = re.sub('".*"','""',line)
+        line = re.sub('".*"',' " " ',line)
+        #memproses char
+        line = re.sub("'.'"," ' ' ",line)
+        #line = re.sub(r"'[^0-9]*[^.][^0-9]*'",r" ' ' ",line)
+        line = re.sub(r"'[^0-9\s]*[^.\s][^0-9\s]*'\s*"," ' ' ",line)
+        #print(line)
     #mengganti setiap simbol menjadi "spasi simbol spasi"
+    #"""
         for token,rep in symbol_dict.items():
             line = re.sub(token,rep,line)
         #handle dot operator
         line = re.sub(r"([a-zA-Z_])(\w+)*(\.)([a-zA-Z_])(\w+)*",r"\1\2 . \4\5",line)
         if(line!=''): #jika jadi string kosong maka tidak perlu diappend
-            lines_list.append(line)
+            line_array = line.split()
+            #line_array = line
+            lines_list.append(line_array)
 print(lines_list)
-"""
-nyaho
-""" 
+#"""
