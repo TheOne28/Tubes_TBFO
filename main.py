@@ -26,6 +26,8 @@ for line in lines:
     #mengganti setiap simbol menjadi "spasi simbol spasi"
     for token,rep in symbol_dict.items():
         line = re.sub(token,rep,line)
+    #handle dot operator
+    line = re.sub(r"([a-zA-Z_])(\w+)*(\.)([a-zA-Z_])(\w+)*",r"\1\2 . \4\5",line)
     if(line!=''): #jika jadi string kosong maka tidak perlu diappend
         lines_list.append(line)
 print(lines_list)
