@@ -9,3 +9,8 @@ tuple = ( 3, 4 )
 print(7.8)
 a = 'nyaho'
 a = a.replace('n','my')
+
+"""
+Ima wa Zero Senchi
+
+"""
