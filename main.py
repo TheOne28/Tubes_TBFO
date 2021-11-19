@@ -1,5 +1,6 @@
 import sys
 import re
+from cnfgenerator import CNFfromFile
 
 #dictionary buat konversi symbol
 symbol_dict = {
@@ -62,7 +63,15 @@ def preprocess(nama_file):
     return lines_list
 
 
-#meminta nama file
-nama_file = sys.argv[1]
-hasil_tokenisasi = preprocess(nama_file)
-print(hasil_tokenisasi)
+
+def main():
+    #meminta nama file
+    nama_file = sys.argv[1]
+    hasil_tokenisasi = preprocess(nama_file)
+    print(hasil_tokenisasi)
+    CNF = CNFfromFile("grammar.txt")
+    with open("cnfResult.txt", "w") as f:
+        f.write(str(CNF))
+
+if __name__ == '__main__':
+    main()
