@@ -12,6 +12,14 @@ symbol_dict = {
     '\}': " } ",
     r'(\<=)': " <= ",
     r'\>=': " >= ",
+    r'(\@=)': " @= ",
+    r'(\+=)': " += ",
+    r'(\-=)': " -= ",
+    r'(\*\*=)': " **= ",
+    r'(//=)': " //= ",
+    r'([^\*])(\*=)': " *= ",
+    r'([^\/])(\/=)': " /= ",
+    r'(\%=)': " %= ",
     r'\<([^=])': r" < \1",
     r'\>([^=])': r" > \1",
     '\==': " == ",
@@ -20,6 +28,11 @@ symbol_dict = {
     r'(.)\:': r"\1 : ", 
     r' \=([^=])': r" = \1", 
 }
+#list berisii symbol di  python
+python_symbols = ('False','class','finally','is','return','None','continue','for','lambda','try','True','def','from','nonlocal','while',
+                    'and','del','global','not','with','as','elif','if','or','yield','assert','else','import','pass','break','except','in',
+                    'raise',
+)
 def preprocess(nama_file):
     #membuka file
     lines = open(nama_file,'r')
@@ -28,16 +41,16 @@ def preprocess(nama_file):
     start_multiline_comment = False
     lines_list = []
     for line in lines:
-        #Kalau si line berada dalam multiline, maka dihapus saja
-        if(start_multiline_comment):
-            line = ''
         #Jika ketemu start multiline
         if(re.search(r"\"\"\"",line)):
             if start_multiline_comment: #ketemu end komentar
                 start_multiline_comment = False
             else: #Ketemu start dari komentar
                 start_multiline_comment = True
-                line = ''
+            line = ''
+                #Kalau si line berada dalam multiline, maka dihapus saja
+        if(start_multiline_comment):
+            line = ''
         else:#Bukan komentar multiline
             #mengganti new line dengan string kosong( Ngaruh ke isi string juga, tapi karena entar isi string dikosongin, mestinya gak ngaruh ke validasi program)
             line  = re.sub('\n','',line)
@@ -56,6 +69,23 @@ def preprocess(nama_file):
                 line = re.sub(token,rep,line)
             #handle dot operator
             line = re.sub(r"([a-zA-Z_])(\w+)*(\.)([a-zA-Z_])(\w+)*",r"\1\2 . \4\5",line)
+            #Memeriksa variabel(jika ada),kalau valid masukkin ke token kalau gak gak dimasukin
+            for baris in re.findall(r".* \= .*",line):
+                #print(re.findall(r".* \= .*",line)
+                #Memeriksa tiap elemen baris yang memenuhi
+                #Menghilangkan = dan isi (), {},serta []
+                baris = re.sub(r'=',"",baris)
+                baris = baris.split()
+                print(baris)
+                for token in baris: #Periksa tiap token
+                    if(token not in python_symbols and True):#Periksa yang gak ada di symbols
+                        pass
+            #        #cek validitas
+            #        if(not re.search(r"[a-zA-Z_][a-zA-Z_0-9]*",token)):#token gak  valid
+            #            line = re.sub(token,'',line)
+            #        else:
+            #            line = re.sub(token,'VAR',line)
+            #menambahkan token di suatu line ke lines_list
             if(line!=''): #jika jadi string kosong maka tidak perlu diappend
                 line_array = line.split()
                 #line_array = line

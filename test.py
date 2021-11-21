@@ -14,3 +14,23 @@ a = a.replace('n','my')
 Ima wa Zero Senchi
 
 """
+aSDJOJoJR_ = 2
+sG03474_& = 40
+Ahehih = 30
+_ = 3
+_34D = 40
+04333A = 3
+0 = 10
+01_ = 2
+
+x = 2
+x  += 3
+x -= 1
+x *= 4
+x /= 3
+x %= 10
+x //= 4
+x **= 100
+a = [3,4]
+b = [5,4]
+a @= b
