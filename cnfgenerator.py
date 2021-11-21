@@ -77,6 +77,7 @@ def simplify(CFG):
           products.remove(product)
           newProduct = copy.deepcopy([
             product for product in CFG[product[0]]
+            if product not in products
           ])
           products.extend(newProduct)
           loop = True
@@ -109,7 +110,7 @@ def convertToCNF(CFG):
     nonSingleProducts = [product for product in products if len(product) > 1]
     for nonSingleProduct in nonSingleProducts: # iterasi setiap produksi yang panjangnya lebih dari 1
       for symbol in nonSingleProduct: # ambil setiap simbol pada product
-        if (not isNonTerminal(symbol) and symbol not in terminal): # jika simbol bukan non terminal dan belum ada di set
+        if (not isNonTerminal(symbol) and symbol not in terminals): # jika simbol bukan non terminal dan belum ada di set
           terminals.append(symbol)
     
     for i, terminal in enumerate(terminals):
@@ -124,8 +125,8 @@ def convertToCNF(CFG):
     
     idx = 1
     for i in range(len(products)):
-      while (len(products[i]) > 1): # selama panjang products lebih dari 1
-        # tambahkan aturan baru agar panjangnya hanya 2
+      while (len(products[i]) > 2): # selama panjang products lebih dari 2
+        # ubah aturan sehingga hanya ada 2 aturan
         addedRule.update({f"{key}_NONTERMINAL_{idx}": [[products[i][0], products[i][1]]]})
         products[i] = products[i][1:]
         products[i][0] = f"{key}_NONTERMINAL_{idx}"
