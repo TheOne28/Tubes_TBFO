@@ -1,6 +1,7 @@
 import sys
 import re
 from cnfgenerator import CNFfromFile
+from cyk_parser import cyk_parser
 
 #dictionary buat konversi symbol
 symbol_dict = {
@@ -75,9 +76,9 @@ def preprocess(nama_file):
             #menghilangkan komentar 1 baris
             line = re.sub(" *#.*",'',line)
             #menghilangkan isi semua string valid
-            line = re.sub('".*"',' " " ',line)
+            line = re.sub('".*"','__str__',line)
             #memproses char
-            line = re.sub("'.'"," ' ' ",line)
+            line = re.sub("'.'","__str__",line)
             #line = re.sub(r"'[^0-9]*[^.][^0-9]*'",r" ' ' ",line)
             line = re.sub(r"'[^0-9\s]*[^.\s][^0-9\s]*'\s*"," ' ' ",line)
             #print(line)
@@ -119,18 +120,18 @@ def preprocess(nama_file):
                         filtered_list = [line_array[idx_assignment]]
                         for i in range(idx_assignment-1,-1,-1):
                             if line_array[i] not in python_symbols and isVarValid(line_array[i]):
-                                line_array[i] = 'VAR'
+                                line_array[i] = '__var__'
                                 filtered_list.insert(0,line_array[i])
                             elif line_array[i] in python_symbols:
                                 filtered_list.insert(0,line_array[i])
                         for i in range(idx_assignment+1,len(line_array)):
-                            if line_array[i] not in python_symbols and AssignedValue(line_array[i])=='accepted_var':
-                                line_array[i] = 'ASSIGNED_VAR'
-                                filtered_list.append(line_array[i])
-                            elif line_array[i] not in python_symbols and AssignedValue(line_array[i])=='accepted_num':
-                                line_array[i] = 'ASSIGNED_NUM'
-                                filtered_list.append(line_array[i])
-                            elif line_array[i] in python_symbols:
+                            # if line_array[i] not in python_symbols and AssignedValue(line_array[i])=='accepted_var':
+                            #     line_array[i] = '__assigned_var__'
+                            #     filtered_list.append(line_array[i])
+                            # elif line_array[i] not in python_symbols and AssignedValue(line_array[i])=='accepted_num':
+                            #     line_array[i] = '__assigned_num__'
+                            #     filtered_list.append(line_array[i])
+                            # elif line_array[i] in python_symbols:
                                 filtered_list.append(line_array[i])
                         line_array = filtered_list
                     #if(line_array[idx_assignment+1] not in python_symbols and idx_assignment>0):
@@ -142,8 +143,17 @@ def preprocess(nama_file):
                          #           line_array[idx_assignment-3] = 'VAR'
                           #          line_array[idx_assignment-1],line_array[idx_assignment+1],line_array[idx_assignment+3]
                 #line_array = line
-                print(line_array)
-                lines_list.append(line_array)
+                # print(line_array)
+                
+                for i in range(len(line_array)):
+                    try:
+                        line_array[i] = float(line_array[i])
+                        line_array[i] = '__num__'
+                    except ValueError:
+                        continue
+                
+                lines_list += line_array + ['\n']
+
     return lines_list
 
 def isVarValid(variabel):
@@ -201,10 +211,20 @@ def main():
     #meminta nama file
     nama_file = sys.argv[1]
     hasil_tokenisasi = preprocess(nama_file)
-    #print(hasil_tokenisasi)
-    CNF = CNFfromFile("grammar.txt")
+
+    # print(hasil_tokenisasi)
+    CNF = CNFfromFile("grammar2.txt")
     with open("cnfResult.txt", "w") as f:
-        f.write(str(CNF))
+        for rule in CNF:
+            f.write(str(rule)+" -> "+ str(CNF[rule]) + "\n")
+            
+        # f.write(str(CNF))
+    
+    # print(CNF)
+    if (cyk_parser(CNF, hasil_tokenisasi)):
+        print("CNF valid")
+    else:
+        print("CNF invalid")
 
 if __name__ == '__main__':
     main()
