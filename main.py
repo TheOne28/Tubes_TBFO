@@ -12,8 +12,8 @@ symbol_dict = {
     '\]': " ] ",
     '\{': " { ",
     '\}': " } ",
-    r'(\<=)': " <= ",
-    r'\>=': " >= ",
+    r'(\<=)': " __com__ ",
+    r'\>=': " __com__ ",
     r'(\<<)': " << ",
     r'\>>': " >> ",
     r'(.*)&=': r"\1& =",
@@ -21,18 +21,18 @@ symbol_dict = {
     r'\|': " | ",
     r'\^': " ^ ",
     r'\~': " ~ ",
-    r'(\@=)': " @= ",
-    r'(\+=)': " += ",
-    r'(\-=)': " -= ",
-    r'(\*\*=)': " **= ",
-    r'(//=)': " //= ",
-    r'([^\*])(\*=)': " *= ",
-    r'([^\/])(\/=)': " /= ",
-    r'(\%=)': " %= ",
+    r'(\@=)': " __assign__ ",
+    r'(\+=)': " __assign__ ",
+    r'(\-=)': " __assign__ ",
+    r'(\*\*=)': " __assign__ ",
+    r'(//=)': " __assign__ ",
+    r'([^\*])(\*=)': " __assign__ ",
+    r'([^\/])(\/=)': " __assign__ ",
+    r'(\%=)': " __assign__ ",
     r'\<([^=])': r" < \1",
     r'\>([^=])': r" > \1",
-    '\==': " == ",
-    '\!=': " != ",
+    '\==': " __com__ ",
+    '\!=': " __com__ ",
     r'\,': r" , ", 
     r'(.*)\:(.*)': r"\1 : \2", 
     r' \=([^=])': r" = \1", 
@@ -103,7 +103,7 @@ def preprocess(nama_file):
                 break
             elif(idxFirstOne == -1):
                 idxSecond = line.find('"', idxFirstTwo + 1)
-            elif(idxFirstTwo == -1): 
+            elif(idxFirstTwo == -1):
                 idxSecond = line.find("'", idxFirstOne + 1)
             else:
                 if(idxFirstOne < idxFirstTwo):
@@ -121,7 +121,10 @@ def preprocess(nama_file):
         for token,rep in symbol_dict.items():
             line = re.sub(token,rep,line)
         #handle dot operator
-        line = re.sub(r"([a-zA-Z_])+(\w+)*(\.)([a-zA-Z_])+(\w+)*",r"\1\2 . \4\5",line)
+        # line = re.sub(r"([a-zA-Z_])+(\w+)*(\.)([a-zA-Z_])+(\w+)*",r"\1\2 . \4\5",line)
+        
+        # pairEqual = ['=','+','-','*=','/=','@','**','//','%', '&', '|', '^', '~', '>>', '<<']
+        line = line.replace("."," . ")
         if(line!=''): # jika jadi string kosong maka tidak perlu diappend
             line_array = line.split()
             print(line_array)
@@ -140,7 +143,7 @@ def preprocess(nama_file):
                         filtered_list.append(line_array[i])
                     except ValueError:
                         print("cant convert")
-                        return [], count                  
+                        return [], count          
                             
                 for operator in assignment_operator:
                     if operator in filtered_list: # Memeriksa jika ada assignment
@@ -207,7 +210,7 @@ def main():
     #meminta nama file
     nama_file = sys.argv[1]
     hasil_tokenisasi, flag = preprocess(nama_file)
-    # print("main:", hasil_tokenisasi)
+    print("main:", hasil_tokenisasi)
     CNF = CNFfromFile("grammar2.txt")
     with open("cnfResult.txt", "w") as f:
         for rule in CNF:

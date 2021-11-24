@@ -21,18 +21,18 @@ OPEN_CURLY_BRACKET -> {
 CLOSE_CURLY_BRACKET -> }
 LESS -> <
 GREATER -> >
-LESS_EQ -> <=
-GREATER_EQ -> >=
-PLUS_ASSIGN -> +=
-MINUS_ASSIGN -> -=
-MULL_ASSIGN -> *=
-DIV_ASSIGN -> /=
-ROUND_DIV_ASSIGN -> //=
-MOD_ASSIGN -> %=
-POW_ASSIGN -> **=
-MATMUL_ASSIGN -> @=
-EQ -> ==
-NOT_EQ -> !=
+PLUS_ASSIGN -> __assign__
+MINUS_ASSIGN -> __assign__
+MULL_ASSIGN -> __assign__
+DIV_ASSIGN -> __assign__
+ROUND_DIV_ASSIGN -> __assign__
+MOD_ASSIGN -> __assign__
+POW_ASSIGN -> __assign__
+MATMUL_ASSIGN -> __assign__
+EQ -> __com__
+NOT_EQ -> __com__
+LESS_EQ -> __com__
+GREATER_EQ -> __com__
 
 COLON -> :
 DOT -> .
@@ -44,12 +44,12 @@ BITWISE_XOR -> ^
 BITWISE_NOT -> ~
 BITWISE_RIGHT_SHIFT -> >>
 BITWISE_LEFT_SHIFT -> <<
-BITWISE_AND_ASSIGN -> &=
-BITWISE_OR_ASSIGN -> __or_sym_assign__
-BITWISE_XOR_ASSIGN -> ^=
-BITWISE_NOT_ASSIGN -> ~=
-BITWISE_RIGHT_SHIFT_ASSIGN -> >>=
-BITWISE_LEFT_SHIFT_ASSIGN -> <<=
+BITWISE_AND_ASSIGN -> __assign__
+BITWISE_OR_ASSIGN -> __assign__
+BITWISE_XOR_ASSIGN -> __assign__
+BITWISE_NOT_ASSIGN -> __assign__
+BITWISE_RIGHT_SHIFT_ASSIGN -> __assign__
+BITWISE_LEFT_SHIFT_ASSIGN -> __assign__
 
 
 AND -> and
