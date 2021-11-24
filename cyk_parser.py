@@ -16,7 +16,6 @@ def cyk_parser(grammar, prob):
         terminal = prob[i]
         #Get all nonterminal that produces prob[i]
         terminal = [terminal]
-        # print(terminal)
         for nonterm in grammar:
             if(terminal in grammar[nonterm]):
                 parsetable[i][i].append(nonterm)
@@ -31,9 +30,6 @@ def cyk_parser(grammar, prob):
                         if(len(prod) != 1):
                             if((prod[0] in parsetable[j][k]) and (prod[1] in parsetable[k + 1][ind]) and (nonterm not in parsetable[j][ind])):
                                 parsetable[j][ind].append(nonterm)  
-
-    # for line in parsetable:
-    #     print(line)
 
     if('S' in parsetable[0][numb-1]):
         return True

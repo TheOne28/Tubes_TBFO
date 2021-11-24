@@ -7,7 +7,7 @@ python_symbols = ('False','class','finally','is','return','None','continue','for
                     'and','del','global','not','with','as','elif','if','or','yield','assert','else','import','pass','break','except','in','raise','(',')','[',']','{','}','.',',','<=','>=','<<','>>','&','|','^','~','<','>','==','!=',':','@','+','-','*','/', '%','//','**',"__str__", "="
 )
 compare_operator = ('<=', '>=', '==', '!=')
-assignment_operator = ('+=','-=','*=','/=','@=','**=','//=','%=', '&=', '|=', '^=', '~=', '>>=', '<<=')
+assignment_operator = ('+=','-=','**=','*=','//=','/=','@=','%=', '&=', '|=', '^=', '~=', '>>=', '<<=')
 brackets = ('[',']','(',')','{','}')    
 substitute = ("__str__", "__assign__", "__comp__", "__doubleop__")
 double_operator = ('>>' , '<<', '//', '**',)
@@ -35,23 +35,26 @@ def preprocess(nama_file):
         elif(idxFirstTwo == -1): 
             idxSecond = lines.find("'''", idxFirstOne + 3)
         else:
-            if(idxFirstOne < idxFirstTwo):
+            if(idxFirstOne > idxFirstTwo):
                 idxSecond = lines.find('"""', idxFirstTwo + 3)
             else:
                 idxSecond = lines.find("'''", idxFirstOne + 3)
 
-        if((idxFirstOne == -1) and (idxSecond != -1)):
+        if ((idxFirstOne != -1) and (idxFirstTwo != -1)):
+            if (idxFirstOne < idxFirstTwo):
+                lines = lines.replace(lines[idxFirstOne:idxSecond + 3], "__str__")
+            else:
+                lines = lines.replace(lines[idxFirstTwo:idxSecond + 3], "__str__")
+        elif((idxFirstOne == -1) and (idxSecond != -1)):
             lines = lines.replace(lines[idxFirstTwo:idxSecond + 3], "__str__")
         elif((idxFirstTwo == -1) and (idxSecond != -1)):
             lines = lines.replace(lines[idxFirstOne:idxSecond + 3], "__str__")
         else:
             return [], False
 
-    # print(lines)
     count = 0
     lines = lines.split('\n')
     for line in lines:
-        # print(line)
         #mengganti new line dengan string kosong( Ngaruh ke isi string juga, tapi karena entar isi string dikosongin, mestinya gak ngaruh ke validasi program)
         line  = line.replace('\n', '')
         #menghilangkan komentar 1 baris
@@ -69,11 +72,16 @@ def preprocess(nama_file):
                 idxSecond = line.find("'", idxFirstOne + 1)
             else:
                 if(idxFirstOne < idxFirstTwo):
-                    idxSecond = line.find('"', idxFirstTwo + 1)
-                else:
                     idxSecond = line.find("'", idxFirstOne + 1)
+                else:
+                    idxSecond = line.find('"', idxFirstTwo + 1)
     
-            if((idxFirstOne == -1) and (idxSecond != -1)):
+            if ((idxFirstOne != -1) and (idxFirstTwo != -1)):
+                if (idxFirstOne < idxFirstTwo):
+                    line = line.replace(line[idxFirstOne:idxSecond + 1], "__str__")
+                else:
+                    line = line.replace(line[idxFirstTwo:idxSecond + 1], "__str__")                    
+            elif((idxFirstOne == -1) and (idxSecond != -1)):
                 line = line.replace(line[idxFirstTwo:idxSecond + 1], "__str__")
             elif((idxFirstTwo == -1) and (idxSecond != -1)):
                 line = line.replace(line[idxFirstOne:idxSecond + 1], "__str__")
@@ -107,9 +115,7 @@ def preprocess(nama_file):
 
         if(line!=''): # jika jadi string kosong maka tidak perlu diappend
             line_array = line.split()
-            print(line_array)
             filtered_list = []
-            # print(line_array)
             for i in range(len(line_array)):
                 if line_array[i] in python_symbols or line_array[i] in assignment_operator or line_array[i] in substitute:
                     filtered_list.append(line_array[i])
@@ -122,7 +128,6 @@ def preprocess(nama_file):
                         line_array[i] = '__num__'
                         filtered_list.append(line_array[i])
                     except ValueError:
-                        print("cant convert")
                         return [], count          
                             
                 for operator in assignment_operator:
@@ -135,8 +140,6 @@ def preprocess(nama_file):
             line_array = filtered_list
             lines_list += line_array + ['\n']
         count += 1
-
-    # print("finish")
     return lines_list, -1
 
 def isVarValid(variabel):
@@ -180,43 +183,53 @@ def validateBreakConReturn(hasil_tokenisasi):
         for j in range(i):
             if (hasil_tokenisasi[j] == '\n'):
                 count += 1
-    
-    #print(hasil_tokenisasi)
+
     return flag, count
-    
+
+def displaySrc(filename):
+    print("\n\t\t\t\tSOURCE CODE")
+    print("===================================================================")
+    with open(filename, "r") as f:
+        counter = 1
+        for line in f:
+            print(f"{counter}\t|", line,end="")
+            counter += 1
+            
+    print("\n===================================================================")
+    print("\t\t\t\tEND CODE")
+
 def main():
     RED = "\033[1;37;41m"
     ENDC = '\033[0m'
     #meminta nama file
     nama_file = sys.argv[1]
-    hasil_tokenisasi, flag = preprocess(nama_file)
-    print("main:", hasil_tokenisasi)
-    CNF = CNFfromFile("grammar2.txt")
-    with open("cnfResult.txt", "w") as f:
-        for rule in CNF:
-            f.write(str(rule)+" -> "+ str(CNF[rule]) + "\n")
-            
-        # f.write(str(CNF))
     
-    # print(CNF)
-        flagToken, count = validateBreakConReturn(hasil_tokenisasi)
-        if (flagToken and flag == -1):     
-            if (cyk_parser(CNF, hasil_tokenisasi)):
-                print("CNF valid")
-            else:
-                print("CNF invalid")
+    displaySrc(nama_file)
+    
+    print("\nCHECKING SYNTAX...")
+    print("\nRESULT: \n")
+    
+    hasil_tokenisasi, flag = preprocess(nama_file)
+    CNF = CNFfromFile("grammar2.txt")
+    
+    flagToken, count = validateBreakConReturn(hasil_tokenisasi)
+    if (flagToken and flag == -1):
+        if (cyk_parser(CNF, hasil_tokenisasi)):
+            print("Accepted")
         else:
-            if (flag != -1): count = flag
-            with (open(nama_file, "r")) as f:
-                i = 0
-                while (i<=count):
-                    line = f.readline()
-                    if (line != "\n"):
-                        i += 1
-                if (flag == -1): line = line[:len(line)-1]
-                
-                print(RED + line + ENDC)
-                print(f"^Syntax Error on line {count+1}\n")
+            print("Syntax Error")
+    else:
+        if (flag != -1): count = flag
+        with (open(nama_file, "r")) as f:
+            i = 0
+            while (i<=count):
+                line = f.readline()
+                if (line != "\n"):
+                    i += 1
+            if (flag == -1): line = line[:len(line)-1]
+            
+            print(RED + line + ENDC)
+            print(f"^Syntax Error on line {count+1}\n")
 
 if __name__ == '__main__':
     main()
