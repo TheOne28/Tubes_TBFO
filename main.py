@@ -38,8 +38,8 @@ symbol_dict = {
     r' \=([^=])': r" = \1", 
     r'\@{1}([^\=])': r" @ \1",
     r'\+{1}([^\=])': r" + \1",
-    r'\-{1}([^\=])': r" - \1",
-    r'[^\*]\*{1}([^\=\*])': r" * \1",
+    r'\-{1}([^\=0-9])': r" - \1",
+    r'([^\*])\*{1}([^\=\*])': r"\1 * \2",
     r'[^\/]\/{1}([^\=\/])': r" / \1",
     r'\%([^\=])': r" % \1",
     r'//([^=])': r" // \1",
@@ -124,6 +124,7 @@ def preprocess(nama_file):
         line = re.sub(r"([a-zA-Z_])+(\w+)*(\.)([a-zA-Z_])+(\w+)*",r"\1\2 . \4\5",line)
         if(line!=''): # jika jadi string kosong maka tidak perlu diappend
             line_array = line.split()
+            print(line_array)
             filtered_list = []
             # print(line_array)
             for i in range(len(line_array)):
@@ -197,7 +198,7 @@ def validateBreakConReturn(hasil_tokenisasi):
             if (hasil_tokenisasi[j] == '\n'):
                 count += 1
     
-    print(hasil_tokenisasi)
+    #print(hasil_tokenisasi)
     return flag, count
     
 def main():
