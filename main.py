@@ -6,7 +6,9 @@ from cnfgenerator import CNFfromFile
 from cyk_parser import cyk_parser
 
 #Tuple berisi keyword di  python
-python_symbols = ('False','class','is','return','None','continue','for','True','def','from','while', 'and','not','with','as','elif','if','or','assert','else','import','pass','break','except','in','raise')
+python_symbols = ('False','class','finally','is','return','None','continue','for','lambda','try','True','def','from','nonlocal','while',
+                    'and','del','global','not','with','as','elif','if','or','yield','assert','else','import','pass','break','except','in','raise','(',')','[',']','{','}','.',',','<=','>=','<<','>>','&','|','^','~','<','>','==','!=',':','@','+','-','*','/', '%','//','**',"__str__", "="
+)
 compare_operator = ('<=', '>=', '==', '!=') #Tuple berisi Compare operator
 assignment_operator = ('+=','-=','**=','*=','//=','/=','@=','%=', '&=', '|=', '^=', '~=', '>>=', '<<=') #Tuple berisi Assignment Operator
 brackets = ('[',']','(',')','{','}')  #Tuple berisi bracket  
@@ -53,7 +55,7 @@ def preprocess(nama_file):
         elif((idxFirstTwo == -1) and (idxSecond != -1)):
             lines = lines.replace(lines[idxFirstOne:idxSecond + 3], "__str__")
         else:
-            return [], -2
+            return [], False
 
     count = 0
     lines = lines.split('\n')
@@ -92,7 +94,7 @@ def preprocess(nama_file):
             elif((idxFirstTwo == -1) and (idxSecond != -1)):
                 line = line.replace(line[idxFirstOne:idxSecond + 1], "__str__")
             else:
-                return [], -3
+                return [], False
 
         #Menghilangkan komen per baris (ditandai dengan #)
         if(line.find('#') != -1):
@@ -235,37 +237,17 @@ def main():
         else:
             print("Syntax Error")
     else:
-        if(flag == -2):
-            print("Syntax error in multiline declaration")
-        elif(flag == -3):
-            print("Syntax error in string declaration")
-        elif(flag != -1): 
-            count = flag
-            line = ""
-            with (open(nama_file, "r")) as f:
-                i = 0
-                while (i<= count):
-                    line = f.readline()
-                    if(count == flag):
-                        i += 1
-                    else:
-                        if(line != '\n'):
-                            i += 1
-                if (flag == -1): line = line[:len(line)-1]
+        if (flag != -1): count = flag
+        with (open(nama_file, "r")) as f:
+            i = 0
+            while (i<=count):
+                line = f.readline()
+                if (line != "\n"):
+                    i += 1
+            if (flag == -1): line = line[:len(line)-1]
             
-                print(RED + line + ENDC)
-                print(f"^Syntax Error on line {count+1}\n")
-        else:
-            line = ""
-            with (open(nama_file, "r")) as f:
-                i = 0
-                while (i<= count):
-                    line = f.readline()
-                    if(line != '\n'):
-                        i += 1
-                if (flag == -1): line = line[:len(line)]
-            
-                print(RED + line + ENDC)
-                print(f"^Syntax Error on line {count+1}\n")
+            print(RED + line + ENDC)
+            print(f"^Syntax Error on line {count+1}\n")
+
 if __name__ == '__main__':
     main()
