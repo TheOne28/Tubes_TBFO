@@ -36,14 +36,14 @@ symbol_dict = {
     r'\,': r" , ", 
     r'(.)\:': r"\1 : ", 
     r' \=([^=])': r" = \1", 
-    r'\@{1}[^\=]': " @ ",
-    r'\+{1}[^\=]': " + ",
-    r'\-{1}[^\=]': " - ",
-    r'[^\*]\*{1}[^\=\*]': " * ",
-    r'[^\/]\/{1}[^\=\/]': " / ",
-    r'\%[^\=]': " % ",
-    r'//[^=]': " // ",
-    r'\*\*[^=]': " ** ",
+    r'\@{1}([^\=])': r" @ \1",
+    r'\+{1}([^\=])': r" + \1",
+    r'\-{1}([^\=])': r" - \1",
+    r'[^\*]\*{1}([^\=\*])': r" * \1",
+    r'[^\/]\/{1}([^\=\/])': r" / \1",
+    r'\%([^\=])': r" % \1",
+    r'//([^=])': r" // \1",
+    r'\*\*([^=])': r" ** \1",
 }
 #list berisii symbol di  python
 python_symbols = ('False','class','finally','is','return','None','continue','for','lambda','try','True','def','from','nonlocal','while',
@@ -59,16 +59,27 @@ def preprocess(nama_file):
     #preprocess
     #Status multiline comment:  False berarti yg terakhir dibaca end comment/belum baca sama sekali, True berarti yang terakhir baca start comment
     start_multiline_comment = False
+    multiline_comment = ''
     lines_list = []
     for line in lines:
         #Jika ketemu start multiline
         if(re.search(r"\"\"\"",line)):
-            if start_multiline_comment: #ketemu end komentar
+            if start_multiline_comment and multiline_comment=='"""': #ketemu end komentar
                 start_multiline_comment = False
-            else: #Ketemu start dari komentar
+                multiline_comment = ''
+            elif not start_multiline_comment: #Ketemu start dari komentar
                 start_multiline_comment = True
+                multiline_comment = '"""'
             line = ''
-                #Kalau si line berada dalam multiline, maka dihapus saja
+        if(re.search(r"\'\'\'",line)):
+            if start_multiline_comment  and multiline_comment=="'''": #ketemu end komentar
+                start_multiline_comment = False
+                multiline_comment = ''
+            elif not start_multiline_comment: #Ketemu start dari komentar
+                start_multiline_comment = True
+                multiline_comment = "'''"
+            line = ''
+        #Kalau si line berada dalam multiline, maka dihapus saja
         if(start_multiline_comment):
             line = ''
         else:#Bukan komentar multiline
@@ -85,13 +96,12 @@ def preprocess(nama_file):
         #mengganti setiap simbol menjadi "spasi simbol spasi"
         #"""
             #print(line)
+           # print(line)
             for token,rep in symbol_dict.items():
-<<<<<<< HEAD
                 #print(token, rep)
                 #print(line)
-=======
->>>>>>> f66718b72cb272f35e5097c7f5433ba21b11650e
                 line = re.sub(token,rep,line)
+            #print(line)
             #print(line.split())
             #handle dot operator
             line = re.sub(r"([a-zA-Z_])(\w+)*(\.)([a-zA-Z_])(\w+)*",r"\1\2 . \4\5",line)
@@ -112,6 +122,7 @@ def preprocess(nama_file):
             #        else:
             #            line = re.sub(token,'VAR',line)
             #menambahkan token di suatu line ke lines_list
+            #print(line)
             if(line!=''): #jika jadi string kosong maka tidak perlu diappend
                 line_array = line.split()
                 #for token in line_array:
@@ -143,12 +154,13 @@ def preprocess(nama_file):
                      #   line_array = filtered_list
                 #print(line_array)
                 filtered_list = []
+                #print(filtered_list)
                 for i in range(len(line_array)):
                     if line_array[i] not in python_symbols and isVarValid(line_array[i]):
                         line_array[i] = '__var__'
                         filtered_list.append(line_array[i])
-                    elif not isVarValid(line_array[i]):
-                        return 'tak_valid'
+                  #  elif not isVarValid(line_array[i]):
+                   #     return 'tak_valid'
                     elif line_array[i] in python_symbols or line_array[i] in assignment_operator:
                         filtered_list.append(line_array[i])
                     else:
@@ -160,6 +172,7 @@ def preprocess(nama_file):
                             continue
                         else:
                             filtered_list.append(line_array[i])
+                    #print(filtered_list)
                     for operator in assignment_operator:
                         if operator in filtered_list: #Memeriksa jika ada assignment
                             idx_assignment = filtered_list.index(operator)-1
@@ -172,7 +185,7 @@ def preprocess(nama_file):
                                     filtered_list.pop(idx_assignment)
                                 idx_assignment -= 1
                                 #i += 1
-
+                    #print(filtered_list)
                 line_array = filtered_list
                     #if(line_array[idx_assignment+1] not in python_symbols and idx_assignment>0):
                     #    if(isAssignedValid(line_array[idx_assignment+1])):
@@ -191,6 +204,7 @@ def preprocess(nama_file):
                 #        line_array[i] = '__num__'
                 #    except ValueError:
                 #        continue
+                print(line_array)
                 lines_list += line_array + ['\n']
 
     return lines_list
@@ -250,9 +264,9 @@ def main():
     #meminta nama file
     nama_file = sys.argv[1]
     hasil_tokenisasi = preprocess(nama_file)
-    if(hasil_tokenisasi=='tak_valid'):
-        print("CNF invalid")
-        return
+   # if(hasil_tokenisasi=='tak_valid'):
+    #    print("CNF invalid")
+     #   return
     print(hasil_tokenisasi)
     CNF = CNFfromFile("grammar2.txt")
     with open("cnfResult.txt", "w") as f:
