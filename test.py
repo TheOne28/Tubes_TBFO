@@ -36,3 +36,5 @@ b = [5,4]
 a @= b
 x = 2 + 3
 a,b = b,a
+for i in [1,2,3]:
+    break

@@ -1,3 +1,4 @@
+from os import remove
 import sys
 import re
 from cnfgenerator import CNFfromFile
@@ -32,7 +33,7 @@ symbol_dict = {
     r'\>([^=])': r" > \1",
     '\==': " == ",
     '\!=': " != ",
-    r'(.)\,(.)': r"\1 , \2", 
+    r'\,': r" , ", 
     r'(.)\:': r"\1 : ", 
     r' \=([^=])': r" = \1", 
     r'\@{1}[^\=]': " @ ",
@@ -48,7 +49,7 @@ symbol_dict = {
 python_symbols = ('False','class','finally','is','return','None','continue','for','lambda','try','True','def','from','nonlocal','while',
                     'and','del','global','not','with','as','elif','if','or','yield','assert','else','import','pass','break','except','in',
                     'raise','(',')','[',']','{','}','.',',','<=','>=','<<','>>','&','|','^','~','<','>','==','!=',':','@','+','-','*','/',
-                    '%','//','**',
+                    '%','//','**',"__str__",
 )
 assignment_operator = ('=','+=','-=','*=','/=','@=','**=','//=','%=')
 brackets = ('[',']','(',')','{','}')
@@ -80,12 +81,13 @@ def preprocess(nama_file):
             #memproses char
             line = re.sub("'.'","__str__",line)
             #line = re.sub(r"'[^0-9]*[^.][^0-9]*'",r" ' ' ",line)
-            line = re.sub(r"'[^0-9\s]*[^.\s][^0-9\s]*'\s*"," ' ' ",line)
-            #print(line)
+            line = re.sub(r"'[^0-9\s]*[^.\s][^0-9\s]*'\s*","__str__",line)
         #mengganti setiap simbol menjadi "spasi simbol spasi"
         #"""
+            #print(line)
             for token,rep in symbol_dict.items():
                 line = re.sub(token,rep,line)
+            #print(line.split())
             #handle dot operator
             line = re.sub(r"([a-zA-Z_])(\w+)*(\.)([a-zA-Z_])(\w+)*",r"\1\2 . \4\5",line)
             #Memeriksa variabel(jika ada),kalau valid masukkin ke token kalau gak gak dimasukin
@@ -109,22 +111,22 @@ def preprocess(nama_file):
                 line_array = line.split()
                 #for token in line_array:
                 #print(line_array)
-                for operator in assignment_operator:
-                    if operator in line_array: #Memeriksa jika ada assignment
-                        idx_assignment = line_array.index(operator)
+              #  for operator in assignment_operator:
+                 #   if operator in line_array: #Memeriksa jika ada assignment
+                      #  idx_assignment = line_array.index(operator)
                         #Memproses Assignment
                         #if(line_array[idx_assignment-1] not in python_symbols and idx_assignment>0):
                         #    if(isVarValid(line_array[idx_assignment-1])):
                         #        line_array[idx_assignment-1]='VAR'
                         #print(line_array)
-                        filtered_list = [line_array[idx_assignment]]
-                        for i in range(idx_assignment-1,-1,-1):
-                            if line_array[i] not in python_symbols and isVarValid(line_array[i]):
-                                line_array[i] = '__var__'
-                                filtered_list.insert(0,line_array[i])
-                            elif line_array[i] in python_symbols:
-                                filtered_list.insert(0,line_array[i])
-                        for i in range(idx_assignment+1,len(line_array)):
+                       # filtered_list = [line_array[idx_assignment]]
+                       # for i in range(idx_assignment-1,-1,-1):
+                          #  if line_array[i] not in python_symbols and isVarValid(line_array[i]):
+                          #      line_array[i] = '__var__'
+                           #     filtered_list.insert(0,line_array[i])
+                         #   elif line_array[i] in python_symbols:
+                          #      filtered_list.insert(0,line_array[i])
+                     #   for i in range(idx_assignment+1,len(line_array)):
                             # if line_array[i] not in python_symbols and AssignedValue(line_array[i])=='accepted_var':
                             #     line_array[i] = '__assigned_var__'
                             #     filtered_list.append(line_array[i])
@@ -132,8 +134,39 @@ def preprocess(nama_file):
                             #     line_array[i] = '__assigned_num__'
                             #     filtered_list.append(line_array[i])
                             # elif line_array[i] in python_symbols:
-                                filtered_list.append(line_array[i])
-                        line_array = filtered_list
+                       #         filtered_list.append(line_array[i])
+                     #   line_array = filtered_list
+                #print(line_array)
+                filtered_list = []
+                for i in range(len(line_array)):
+                    if line_array[i] not in python_symbols and isVarValid(line_array[i]):
+                        line_array[i] = '__var__'
+                        filtered_list.append(line_array[i])
+                    elif line_array[i] in python_symbols or line_array[i] in assignment_operator:
+                        filtered_list.append(line_array[i])
+                    else:
+                        try:
+
+                            line_array[i] = float(line_array[i])
+                            line_array[i] = '__num__'
+                        except ValueError:
+                            continue
+                        else:
+                            filtered_list.append(line_array[i])
+                    for operator in assignment_operator:
+                        if operator in filtered_list: #Memeriksa jika ada assignment
+                            idx_assignment = filtered_list.index(operator)-1
+                            #menghapus num di kiri
+                            #i = 0
+                            #while( i <= idx_assignment):
+                            while(idx_assignment>=0):
+                            #while( '__num__' in filtered_list):
+                                if filtered_list[idx_assignment]=='__num__':
+                                    filtered_list.pop(idx_assignment)
+                                idx_assignment -= 1
+                                #i += 1
+
+                line_array = filtered_list
                     #if(line_array[idx_assignment+1] not in python_symbols and idx_assignment>0):
                     #    if(isAssignedValid(line_array[idx_assignment+1])):
                     #        line_array[idx_assignment+1]='ASSIGNMENT'                     
@@ -145,13 +178,13 @@ def preprocess(nama_file):
                 #line_array = line
                 # print(line_array)
                 
-                for i in range(len(line_array)):
-                    try:
-                        line_array[i] = float(line_array[i])
-                        line_array[i] = '__num__'
-                    except ValueError:
-                        continue
-                
+                #for i in range(len(line_array)):
+                #    try:
+                #        line_array[i] = float(line_array[i])
+                #        line_array[i] = '__num__'
+                #    except ValueError:
+                #        continue
+                print(line_array)
                 lines_list += line_array + ['\n']
 
     return lines_list
