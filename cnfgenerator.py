@@ -113,15 +113,15 @@ def convertToCNF(CFG):
         if (not isNonTerminal(symbol) and symbol not in terminals): # jika simbol bukan non terminal dan belum ada di set
           terminals.append(symbol)
     
-    for i, terminal in enumerate(terminals):
+    for i in range(len(terminals)):
       # tambahkan aturan baru untuk setiap terminal
-      addedRule.update({f"{key}_TERMINAL_{i+1}": [[terminal]]})
-      for j, product in enumerate(products):
-        if len(product) > 1:
-          for k in range(len(product)):
-            if (len(products[j][k]) == len(terminal)):
+      addedRule.update({f"{key}_TERMINAL_{i+1}": [[terminals[i]]]})
+      for j in range(len(products)):
+        if len(products[j]) > 1:
+          for k in range(len(products[j])):
+            if (len(products[j][k]) == len(terminals[i])):
               # ganti terminal simbol dengan nonterminal simbol
-              products[j][k] = products[j][k].replace(terminal, f"{key}_TERMINAL_{i+1}") 
+              products[j][k] = products[j][k].replace(terminals[i], f"{key}_TERMINAL_{i+1}") 
     
     idx = 1
     for i in range(len(products)):
