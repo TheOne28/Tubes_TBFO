@@ -7,10 +7,10 @@ BOOL -> True | False
 PLUS -> +
 MINUS -> -
 MULL -> *
-ROUND_DIV -> //
+ROUND_DIV -> __doubleop__
 MOD -> %
 DIV -> /
-POW -> **
+POW -> __doubleop__
 ASSIGN -> = 
 MATMUL -> @ 
 OPEN_BRACKET -> (
@@ -42,8 +42,8 @@ BITWISE_AND -> &
 BITWISE_OR -> __or_sym__
 BITWISE_XOR -> ^
 BITWISE_NOT -> ~
-BITWISE_RIGHT_SHIFT -> >>
-BITWISE_LEFT_SHIFT -> <<
+BITWISE_RIGHT_SHIFT -> __doubleop__
+BITWISE_LEFT_SHIFT -> __doubleop__
 BITWISE_AND_ASSIGN -> __assign__
 BITWISE_OR_ASSIGN -> __assign__
 BITWISE_XOR_ASSIGN -> __assign__

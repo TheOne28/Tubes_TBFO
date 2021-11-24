@@ -1,56 +1,19 @@
-from os import remove
 import sys
-import re
 from cnfgenerator import CNFfromFile
 from cyk_parser import cyk_parser
 
-#dictionary buat konversi symbol
-symbol_dict = {
-    '\(': " ( ",
-    '\)': " ) ",
-    '\[': " [ ",
-    '\]': " ] ",
-    '\{': " { ",
-    '\}': " } ",
-    r'(\<=)': " __com__ ",
-    r'\>=': " __com__ ",
-    r'(\<<)': " << ",
-    r'\>>': " >> ",
-    r'(.*)&=': r"\1& =",
-    r'(.*)& ([^=])': r"\1 & \2",#Kopi untuk aturan lain
-    r'\|': " | ",
-    r'\^': " ^ ",
-    r'\~': " ~ ",
-    r'(\@=)': " __assign__ ",
-    r'(\+=)': " __assign__ ",
-    r'(\-=)': " __assign__ ",
-    r'(\*\*=)': " __assign__ ",
-    r'(//=)': " __assign__ ",
-    r'([^\*])(\*=)': " __assign__ ",
-    r'([^\/])(\/=)': " __assign__ ",
-    r'(\%=)': " __assign__ ",
-    r'\<([^=])': r" < \1",
-    r'\>([^=])': r" > \1",
-    '\==': " __com__ ",
-    '\!=': " __com__ ",
-    r'\,': r" , ", 
-    r'(.*)\:(.*)': r"\1 : \2", 
-    r' \=([^=])': r" = \1", 
-    r'\@{1}([^\=])': r" @ \1",
-    r'\+{1}([^\=])': r" + \1",
-    r'\-{1}([^\=0-9])': r" - \1",
-    r'([^\*])\*{1}([^\=\*])': r"\1 * \2",
-    r'[^\/]\/{1}([^\=\/])': r" / \1",
-    r'\%([^\=])': r" % \1",
-    r'//([^=])': r" // \1",
-    r'\*\*([^=])': r" ** \1",
-}
 #list berisii symbol di  python
 python_symbols = ('False','class','finally','is','return','None','continue','for','lambda','try','True','def','from','nonlocal','while',
                     'and','del','global','not','with','as','elif','if','or','yield','assert','else','import','pass','break','except','in','raise','(',')','[',']','{','}','.',',','<=','>=','<<','>>','&','|','^','~','<','>','==','!=',':','@','+','-','*','/', '%','//','**',"__str__", "="
 )
-assignment_operator = ('=','+=','-=','*=','/=','@=','**=','//=','%=', '&=', '|=', '^=', '~=', '>>=', '<<=')
-brackets = ('[',']','(',')','{','}')
+compare_operator = ('<=', '>=', '==', '!=')
+assignment_operator = ('+=','-=','*=','/=','@=','**=','//=','%=', '&=', '|=', '^=', '~=', '>>=', '<<=')
+brackets = ('[',']','(',')','{','}')    
+substitute = ("__str__", "__assign__", "__comp__", "__doubleop__")
+double_operator = ('>>' , '<<', '//', '**',)
+bitwise_operator = ('&', '|', '~', '^')
+other_symbol = (',', '=', ':', '<', '>', '.')
+ar_operator = ('+', '-', '*', '/', '%', '@')
 
 def preprocess(nama_file):
     #membuka file
@@ -90,11 +53,10 @@ def preprocess(nama_file):
     for line in lines:
         # print(line)
         #mengganti new line dengan string kosong( Ngaruh ke isi string juga, tapi karena entar isi string dikosongin, mestinya gak ngaruh ke validasi program)
-        line  = re.sub('\n','',line)
+        line  = line.replace('\n', '')
         #menghilangkan komentar 1 baris
-        line = re.sub(" *#.*",'',line)
+        
         #menghilangkan isi semua string valid
-
         while(True):
             idxFirstOne = line.find("'")
             idxFirstTwo = line.find('"')
@@ -118,20 +80,38 @@ def preprocess(nama_file):
             else:
                 return [], False
         #mengganti setiap simbol menjadi "spasi simbol spasi"
-        for token,rep in symbol_dict.items():
-            line = re.sub(token,rep,line)
-        #handle dot operator
-        # line = re.sub(r"([a-zA-Z_])+(\w+)*(\.)([a-zA-Z_])+(\w+)*",r"\1\2 . \4\5",line)
+        if(line.find('#') != -1):
+            line = line.replace(line[line.find('#'):], '')
+
+        for symbol in assignment_operator:
+            line = line.replace(symbol, " __assign__ ")
         
-        # pairEqual = ['=','+','-','*=','/=','@','**','//','%', '&', '|', '^', '~', '>>', '<<']
-        line = line.replace("."," . ")
+        for symbol in compare_operator:
+            line = line.replace(symbol, " __comp__ ")
+
+        for symbol in double_operator:
+            line = line.replace(symbol, " __doubleop__ ")
+
+        for symbol in brackets:
+            line = line.replace(symbol, ' {} '.format(symbol))
+
+        for symbol in bitwise_operator:
+            line = line.replace(symbol, ' {} '.format(symbol))
+
+        for symbol in ar_operator:
+            line = line.replace(symbol, ' {} '.format(symbol))
+
+        for symbol in other_symbol:
+            line = line.replace(symbol, ' {} '.format(symbol))
+
+
         if(line!=''): # jika jadi string kosong maka tidak perlu diappend
             line_array = line.split()
             print(line_array)
             filtered_list = []
             # print(line_array)
             for i in range(len(line_array)):
-                if line_array[i] in python_symbols or line_array[i] in assignment_operator or line_array[i] in "__str__":
+                if line_array[i] in python_symbols or line_array[i] in assignment_operator or line_array[i] in substitute:
                     filtered_list.append(line_array[i])
                 elif isVarValid(line_array[i]):
                     line_array[i] = '__var__'
