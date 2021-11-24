@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 print("Namamu saha?")
 if(5<6 and 6<7 and 9==8 and 8!=10 and 9.8 <= 8.9 and 38 >= 9):
     print("C C++")
@@ -39,3 +40,8 @@ a,b = b,a
 for i in [1,2,3]:
     break
 [1,2,3]
+=======
+'''
+
+'''
+>>>>>>> f66718b72cb272f35e5097c7f5433ba21b11650e
