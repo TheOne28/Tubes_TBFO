@@ -10,7 +10,6 @@ def cyk_parser(grammar, prob):
 
     if(numb == 0):
         return True
-    print(numb)
     parsetable = [[[] for i in range(numb)] for j in range(numb)]
 
     #CYK Algorithm
@@ -36,7 +35,8 @@ def cyk_parser(grammar, prob):
                             if((prod[0] in parsetable[j][k]) and (prod[1] in parsetable[k + 1][ind]) and (nonterm not in parsetable[j][ind])):
                                 parsetable[j][ind].append(nonterm)  
 
-    print(parsetable)
+    for line in parsetable:
+        print(line)
 
     if('S' in parsetable[0][numb-1]):
         return True
