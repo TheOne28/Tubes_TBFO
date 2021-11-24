@@ -1,3 +1,6 @@
+# File ini adalah CNF Generator yang digunakan
+# Pada file ini, dilakukan pengubahan CFG menjadi CNF
+
 import copy
 import string
 

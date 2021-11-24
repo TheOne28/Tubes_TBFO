@@ -1,3 +1,5 @@
+# File ini adalah CYK Parser yang digunakan
+# Pada file ini, dilakukan pengecekan syntax dengan CYK 
 
 def cyk_parser(grammar, prob):
     #grammar -> a dictionary of CNF
