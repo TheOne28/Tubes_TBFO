@@ -1,5 +1,3 @@
-from os import pardir
-
 
 def cyk_parser(grammar, prob):
     #grammar -> a dictionary of CNF
@@ -24,7 +22,6 @@ def cyk_parser(grammar, prob):
                 parsetable[i][i].append(nonterm)
     
     #Fill the rest of parsetable
-
     for i in range(1, numb):
         for j in range(numb - i):
             ind = j + i
@@ -35,25 +32,10 @@ def cyk_parser(grammar, prob):
                             if((prod[0] in parsetable[j][k]) and (prod[1] in parsetable[k + 1][ind]) and (nonterm not in parsetable[j][ind])):
                                 parsetable[j][ind].append(nonterm)  
 
-    for line in parsetable:
-        print(line)
+    # for line in parsetable:
+    #     print(line)
 
     if('S' in parsetable[0][numb-1]):
         return True
     else:
         return False
-
-'''
-S -> [['S_NONTERMINAL_1', 'BOOL_EXP'], ['S_NONTERMINAL_2', 'CLOSE_BRACKET'], ['True'], ['False']]
-BOOL_EXP -> [['BOOL_EXP_NONTERMINAL_1', 'BOOL_EXP'], ['BOOL_EXP_NONTERMINAL_2', 'CLOSE_BRACKET'], ['True'], ['False']]
-BOOL_OP -> [['and'], ['or'], ['not']]
-AND -> [['and']]
-OR -> [['or']]
-NOT -> [['not']]
-OPEN_BRACKET -> [['(']]
-CLOSE_BRACKET -> [[')']]
-BOOL -> [['True'], ['False']]
-S_NONTERMINAL_1 -> [['BOOL', 'BOOL_OP']]
-S_NONTERMINAL_2 -> [['OPEN_BRACKET', 'BOOL_EXP']]
-BOOL_EXP_NONTERMINAL_1 -> [['BOOL', 'BOOL_OP']]
-BOOL_EXP_NONTERMINAL_2 -> [['OPEN_BRACKET', 'BOOL_EXP']]'''
