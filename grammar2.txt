@@ -1,5 +1,6 @@
 VAR -> __var__ | VAR DOT VAR
-NUM -> __num__
+NUM_TERM -> __num__
+NUM -> NUM_TERM DOT | DOT NUM_TERM | NUM_TERM DOT NUM_TERM
 STR -> __str__
 BOOL -> True | False
 
