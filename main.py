@@ -86,8 +86,6 @@ def preprocess(nama_file):
         #"""
             #print(line)
             for token,rep in symbol_dict.items():
-                print(token, rep)
-                print(line)
                 line = re.sub(token,rep,line)
             #print(line.split())
             #handle dot operator
@@ -186,7 +184,6 @@ def preprocess(nama_file):
                 #        line_array[i] = '__num__'
                 #    except ValueError:
                 #        continue
-                print(line_array)
                 lines_list += line_array + ['\n']
 
     return lines_list
