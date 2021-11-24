@@ -85,6 +85,8 @@ def preprocess(nama_file):
         #mengganti setiap simbol menjadi "spasi simbol spasi"
         #"""
             for token,rep in symbol_dict.items():
+                print(token, rep)
+                print(line)
                 line = re.sub(token,rep,line)
             #handle dot operator
             line = re.sub(r"([a-zA-Z_])(\w+)*(\.)([a-zA-Z_])(\w+)*",r"\1\2 . \4\5",line)
@@ -211,8 +213,8 @@ def main():
     #meminta nama file
     nama_file = sys.argv[1]
     hasil_tokenisasi = preprocess(nama_file)
-
-    # print(hasil_tokenisasi)
+    
+    print(hasil_tokenisasi)
     CNF = CNFfromFile("grammar2.txt")
     with open("cnfResult.txt", "w") as f:
         for rule in CNF:

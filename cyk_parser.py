@@ -26,20 +26,24 @@ def cyk_parser(grammar, prob):
                     for prod in grammar[nonterm]:
                         if(len(prod) != 1):
                             if((prod[0] in parsetable[j][k]) and (prod[1] in parsetable[k + 1][ind]) and (nonterm not in parsetable[j][ind])):
-                                parsetable[j][ind].append(nonterm)
+                                parsetable[j][ind].append(nonterm)  
 
-    # print(parsetable)
-    # print(terminal)
-    # for elmt in parsetable:
-    #     print(elmt)
-    # print(grammar)
     if('S' in parsetable[0][numb-1]):
         return True
     else:
         return False
 
-
-#Test case
-# CNF = {'S':['AB', 'BC'], 'A': ['BA', 'a'], 'B':['CC', 'b'], 'C':['AB', 'a']}
-# problem = 'baaba'
-# accept = cyk_parser(CNF, problem)
+'''
+S -> [['S_NONTERMINAL_1', 'BOOL_EXP'], ['S_NONTERMINAL_2', 'CLOSE_BRACKET'], ['True'], ['False']]
+BOOL_EXP -> [['BOOL_EXP_NONTERMINAL_1', 'BOOL_EXP'], ['BOOL_EXP_NONTERMINAL_2', 'CLOSE_BRACKET'], ['True'], ['False']]
+BOOL_OP -> [['and'], ['or'], ['not']]
+AND -> [['and']]
+OR -> [['or']]
+NOT -> [['not']]
+OPEN_BRACKET -> [['(']]
+CLOSE_BRACKET -> [[')']]
+BOOL -> [['True'], ['False']]
+S_NONTERMINAL_1 -> [['BOOL', 'BOOL_OP']]
+S_NONTERMINAL_2 -> [['OPEN_BRACKET', 'BOOL_EXP']]
+BOOL_EXP_NONTERMINAL_1 -> [['BOOL', 'BOOL_OP']]
+BOOL_EXP_NONTERMINAL_2 -> [['OPEN_BRACKET', 'BOOL_EXP']]'''
