@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-[1,2,3]
-=======
 print("Namamu saha?")
 if(5<6 and 6<7 and 9==8 and 8!=10 and 9.8 <= 8.9 and 38 >= 9):
     print("C C++")
@@ -41,4 +38,4 @@ x = 2 + 3
 a,b = b,a
 for i in [1,2,3]:
     break
->>>>>>> 24e2ba8079a90a2bebee22bf69d2f3495e7cbee8
+[1,2,3]

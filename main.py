@@ -86,8 +86,8 @@ def preprocess(nama_file):
         #"""
             #print(line)
             for token,rep in symbol_dict.items():
-                print(token, rep)
-                print(line)
+                #print(token, rep)
+                #print(line)
                 line = re.sub(token,rep,line)
             #print(line.split())
             #handle dot operator
@@ -144,6 +144,8 @@ def preprocess(nama_file):
                     if line_array[i] not in python_symbols and isVarValid(line_array[i]):
                         line_array[i] = '__var__'
                         filtered_list.append(line_array[i])
+                    elif not isVarValid(line_array[i]):
+                        return 'tak_valid'
                     elif line_array[i] in python_symbols or line_array[i] in assignment_operator:
                         filtered_list.append(line_array[i])
                     else:
@@ -246,7 +248,9 @@ def main():
     #meminta nama file
     nama_file = sys.argv[1]
     hasil_tokenisasi = preprocess(nama_file)
-    
+    if(hasil_tokenisasi=='tak_valid'):
+        print("CNF invalid")
+        return
     print(hasil_tokenisasi)
     CNF = CNFfromFile("grammar2.txt")
     with open("cnfResult.txt", "w") as f:
